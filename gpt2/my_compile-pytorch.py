@@ -15,6 +15,11 @@ model = AutoModelForCausalLM.from_pretrained(
     attn_implementation="eager",   # avoid fused kernels / flash attention variants
 ).eval()
 
+total_params = sum(p.numel() for p in model.parameters())
+print("Total parameters:")
+print(total_params)
+
+
 # 2) Wrap to have a clean forward (logits only)
 class GPT2Wrapper(torch.nn.Module):
     def __init__(self, core):
