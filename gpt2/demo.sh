@@ -8,11 +8,11 @@ CIRCT_OPT=/home/roland/circt-nix/result/bin/circt-opt
 FIRTOOL=/home/roland/circt-nix/result/bin/firtool
 CIRCT_TRANSLATE=/home/roland/circt-nix/result/bin/circt-translate
 
-rm -f my*.mlir
+rm -f *.mlir
 rm -f dot.v
 
 echo "### 1) PyTorch → Torch-MLIR (torch dialect)"
-python my_compile-pytorch.py > dot-torch.mlir
+python compile-pytorch.py > dot-torch.mlir
 
 echo
 echo "### 2) Torch → Linalg-on-Tensors"
