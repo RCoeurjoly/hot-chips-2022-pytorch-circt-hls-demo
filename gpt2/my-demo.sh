@@ -17,12 +17,8 @@ python my_compile-pytorch.py > my-dot-torch.mlir
 echo
 echo "### 2) Torch → Linalg-on-Tensors"
 $TORCH_MLIR_OPT my-dot-torch.mlir \
-  --torch-decompose-complex-ops \
-  --torch-scalarize-shapes \
-  --convert-torch-to-tmtensor \
-  --convert-torch-to-tensor \
-  --convert-torch-to-linalg \
-  --torch-func-backend-type-conversion \
+  --torch-function-to-torch-backend-pipeline \
+  --torch-backend-to-linalg-on-tensors-backend-pipeline \
   -canonicalize \
   > my-dot-linalg.mlir
 
