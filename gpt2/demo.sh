@@ -17,6 +17,7 @@ python compile-pytorch.py > dot-torch.mlir
 echo
 echo "### 2) Torch → Linalg-on-Tensors"
 $TORCH_MLIR_OPT dot-torch.mlir \
+  --torch-reduce-op-variants \
   --torch-function-to-torch-backend-pipeline \
   --torch-backend-to-linalg-on-tensors-backend-pipeline \
   -canonicalize \
