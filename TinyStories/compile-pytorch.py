@@ -3,53 +3,50 @@ import torch
 from torch_mlir.fx import export_and_import
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-# 1) Load GPT2 (PyTorch)
-MODEL_ID = "gpt2"
+# 1) Load TinyStories-1M
+MODEL_ID = "roneneldan/TinyStories-1M"
+TOKENIZER_ID = "EleutherAI/gpt-neo-125M"
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_ID)
 
-# use_cache=False → simpler graph, avoids KV cache complications
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
-    use_cache=False,
-    attn_implementation="eager",   # avoid fused kernels / flash attention variants
+    use_cache=False,              # required for clean export
+    attn_implementation="eager",  # avoid flash / fused attention
 ).eval()
 
+# Optional sanity check
 total_params = sum(p.numel() for p in model.parameters())
-# print("Total parameters:")
-# print(total_params)
+# print(total_params)  # ~1M
 
-
-# 2) Wrap to have a clean forward (logits only)
-class GPT2Wrapper(torch.nn.Module):
+# 2) Wrapper: logits only
+class CausalLMWrapper(torch.nn.Module):
     def __init__(self, core):
         super().__init__()
         self.core = core
 
     def forward(self, input_ids: torch.Tensor):
-        # input_ids: (batch, seq_len), dtype=torch.long
         out = self.core(input_ids)
         return out.logits
 
-wrapped = GPT2Wrapper(model).eval()
+wrapped = CausalLMWrapper(model).eval()
 
-# 3) Dummy input with static shape
-prompt = "Hello world"
+# 3) Static dummy input
+prompt = "Once upon a time there was"
 encoded = tokenizer(prompt, return_tensors="pt")
-input_ids = encoded["input_ids"]        # shape [1, seq_len], dtype long
+input_ids = encoded["input_ids"]  # [1, seq_len], torch.long
 
-# 4) Export to torch.export ExportedProgram
+# 4) torch.export
 exported = torch.export.export(
     wrapped,
     (input_ids,),
-    strict=False,       # important: GPT2 uses many aten ops / shape logic
+    strict=False,   # GPT-Neo has dynamic shape logic
 )
 
-# 5) Convert ExportedProgram → Torch-MLIR module
+# 5) Torch-MLIR lowering
 mlir_module = export_and_import(exported)
 
-# 6) Print and save MLIR (torch dialect)
 print(mlir_module)
 
-with open("gpt2_torch.mlir", "w") as f:
+with open("tinystories_1m_torch.mlir", "w") as f:
     f.write(str(mlir_module))
