@@ -6,7 +6,7 @@ rc=$?
 
 # interesting = failure/crash
 if [ $rc -ne 0 ]; then
-  exit 0
-else
   exit 1
+else
+  exit 0
 fi
