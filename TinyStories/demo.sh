@@ -17,6 +17,7 @@ python compile-pytorch.py > dot-torch.mlir
 echo
 echo "### 2) Torch → Linalg-on-Tensors"
 $TORCH_MLIR_OPT dot-torch.mlir \
+  -verify-each \
   --torch-reduce-op-variants \
   --torch-function-to-torch-backend-pipeline \
   --torch-backend-to-linalg-on-tensors-backend-pipeline \
@@ -25,6 +26,7 @@ $TORCH_MLIR_OPT dot-torch.mlir \
 
 echo "### 3) Linalg → CF (CIRCT-compatible bufferization)"
 $MLIR_OPT dot-linalg.mlir \
+  -verify-each \
   --empty-tensor-to-alloc-tensor \
   --one-shot-bufferize="bufferize-function-boundaries" \
   --buffer-results-to-out-params \
@@ -43,6 +45,7 @@ $MLIR_OPT dot-cf.mlir --print-op-stats -o /dev/null \
 echo
 echo "### 4) CF → Handshake (with 1D memrefs)"
 $CIRCT_OPT dot-cf.mlir \
+  -verify-each \
   -flatten-memref \
   -flatten-memref-calls \
   -canonicalize \
