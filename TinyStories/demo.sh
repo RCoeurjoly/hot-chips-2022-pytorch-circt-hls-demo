@@ -9,7 +9,6 @@ CIRCT_OPT=/home/roland/circt/build/bin/circt-opt
 FIRTOOL=/home/roland/circt-nix/result/bin/firtool
 CIRCT_TRANSLATE=/home/roland/circt-nix/result/bin/circt-translate
 
-rm -f *.mlir
 rm -f dot.v
 
 echo "### 1) PyTorch → Torch-MLIR (torch dialect)"
