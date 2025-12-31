@@ -4,7 +4,7 @@ set -euo pipefail
 # Tools (adapt paths as needed)
 MLIR_OPT=mlir-opt                              # from nixpkgs#llvmPackages_21.mlir
 TORCH_MLIR_OPT=/home/roland/mlir_venv/bin/torch-mlir-opt
-CIRCT_OPT=/home/roland/circt-nix/result/bin/circt-opt
+# CIRCT_OPT=/home/roland/circt-nix/result/bin/circt-opt
 CIRCT_OPT=/home/roland/circt/build/bin/circt-opt
 FIRTOOL=/home/roland/circt-nix/result/bin/firtool
 CIRCT_TRANSLATE=/home/roland/circt-nix/result/bin/circt-translate
