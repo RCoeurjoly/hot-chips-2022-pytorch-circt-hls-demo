@@ -6,7 +6,7 @@ module {
 {-#
   dialect_resources: {
     builtin: {
-      r: "0x400000003f80000040000000"
+      r: "0x400000003f800000"
     }
   }
 #-}
