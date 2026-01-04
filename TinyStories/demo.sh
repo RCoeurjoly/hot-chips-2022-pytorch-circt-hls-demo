@@ -59,8 +59,14 @@ run "3) Linalg → CF" dot-cf.mlir \
     --convert-scf-to-cf \
     -canonicalize
 
+run "3b) normalize-memrefs" dot-cf-norm.mlir \
+  "$MLIR_OPT" dot-cf.mlir \
+    -verify-each \
+    -normalize-memrefs \
+    -canonicalize
+
 run "4a) flatten-memref" dot-4a.mlir \
-  "$CIRCT_OPT" dot-cf.mlir -verify-each -flatten-memref
+  "$CIRCT_OPT" dot-cf-norm.mlir -verify-each -flatten-memref
 
 run "4b) flatten-memref-calls" dot-4b.mlir \
   "$CIRCT_OPT" dot-4a.mlir -verify-each -flatten-memref-calls
